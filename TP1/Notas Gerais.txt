@@ -1,0 +1,10 @@
+espaço ocupado (ratio)
+qualidade da imagem (percepçao subjetiva de qualidade, justificada)
+
+2 tabelas
+
+NÃO ESQUECER DE TRUNCAR OS MAJÉS
+
+R[R>255] = 255
+R[R<0] = 0
+
