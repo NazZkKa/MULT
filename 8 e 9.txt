@@ -1,0 +1,13 @@
+8 e 9
+
+pegar na dct e dividor por matriz de quantizaçao (rounded)
+
+definir um fator de escala para multiplicar pela matriz 
+
+deve ser armazenada como uint8
+
+
+encoder -> padding, conversoes, dct e quant
+decoder -> inverso
+
+
