@@ -56,6 +56,7 @@ def unpadding(img,nl,nc):
 
 
 def encode(img, nl, nc):
+
     cmRed = clr.LinearSegmentedColormap.from_list(
         'red', [(0, 0, 0), (1, 0, 0)], 256)
     cmGreen = clr.LinearSegmentedColormap.from_list(
@@ -109,23 +110,27 @@ def encode(img, nl, nc):
 
 def rgb2ycbcr(R,G,B):
 
-    Y = 0.299*R+0.597*G+0.144*B
-    Cb = ((B-Y)/1.772)+128
-    Cr = ((R-Y)/1.402)+128
+    T = np.array([[0.299,0.587,0.114],[-0.168736,-0.331264,0.5],[0.5,-0.418688,-0.081312]])
+
+    Y = T[0,0] * R + T[0,1] * G + T[0,2] * B
+    Cb = (T[1,0] * R + T[1,1] * G + T[1,2] * B)+128
+    Cr = (T[2,0] * R + T[2,1] * G + T[2,2] * B)+128
 
     return Y, Cb, Cr
 
 
 def ycbcr2rgb(Y, Cb, Cr):
 
-    R = ((Cr -128)*1.402)+Y
-    B = ((Cb-128)*1.772)+Y
-    G = (Y-0.299*R - 0.144*B)/0.597
+    T = np.array([[1,0,1.402], [1,-0.344136, -0.714136],[1,1.722,0]])
+
+    R = Y + T[0,2] * (Cr-128)
+    G = Y + T[1,1] * (Cb-128)   + T[1,2] * (Cr-128)
+    B = Y + T[2,1] * (Cb-128)   + T[2,2] * (Cr-128)
 
     R[R>255] = 255
     G[G>255] = 255
     B[B>255] = 255
-
+    
     R[R<0] = 0
     G[G<0] = 0
     B[B<0] = 0
@@ -231,7 +236,10 @@ def quantizer(ycbcr, quality):
     QsY[QsY > 255] = 255
     QsC[QsC > 255] = 255
     QsY[QsY < 1] = 1
-    QsC[QsC < 1] = 1
+    QsC[QsC < 1] = 1 
+    QsC = QsC.astype(np.uint8)
+    QsY = QsY.astype(np.uint8)
+    
 
     qy = np.empty(y.shape, dtype=y.dtype)
     qcb = np.empty(cb.shape, dtype=cb.dtype)
@@ -240,17 +248,17 @@ def quantizer(ycbcr, quality):
     for i in range(0, y.shape[0], 8):
         for j in range(0, y.shape[1], 8):
             qy[i:i+8, j:j+8] = y[i:i+8, j:j+8] / QsY
-    qy = np.round(qy)
+    qy = np.round(qy).astype(np.int16)
 
     for i in range(0, cb.shape[0], 8):
         for j in range(0, cb.shape[1], 8):
             qcb[i:i+8, j:j+8] = cb[i:i+8, j:j+8] / QsC
-    qcb = np.round(qcb)
+    qcb = np.round(qcb).astype(np.int16)
 
     for i in range(0, cr.shape[0], 8):
         for j in range(0, cr.shape[1], 8):
             qcr[i:i+8, j:j+8] = cr[i:i+8, j:j+8] / QsC
-    qcr = np.round(qcr)
+    qcr = np.round(qcr).astype(np.int16)
 
     ly = np.log(np.abs(qy) + 0.0001)
     lcb = np.log(np.abs(qcb) + 0.0001)
