@@ -96,10 +96,10 @@ def encode(img, nl, nc):
     plt.title("Cr")
     plt.imshow(imgCr, cmap='gray')
 
-    SubCb, SubCr = subsampling(imgCb, imgCr, (4, 2, 2))
+    SubCb, SubCr = subsampling(imgCb, imgCr, (4, 2, 0))
     imgDCT(imgY, SubCb, SubCr)
-    blockY, blockCb, blockCr = imgBlockDct(imgY, SubCb, SubCr, 64)
-    qy, qcb, qcr = quantizer((blockY, blockCb, blockCr), 10)
+    blockY, blockCb, blockCr = imgBlockDct(imgY, SubCb, SubCr, 8)
+    qy, qcb, qcr = quantizer((blockY, blockCb, blockCr), 25)
 
     qy = DPCM(qy, "y")
     qcb = DPCM(qcb, "cb")
@@ -315,7 +315,7 @@ def decoder(Y,Cb,Cr):
 
 
 if __name__ == "__main__":
-    img_bgr = cv2.imread('./images/barn_mountains.bmp')
+    img_bgr = cv2.imread('./images/logo.bmp')
     print(img_bgr.shape)
     img = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     plt.figure()
