@@ -96,10 +96,10 @@ def encode(img, nl, nc):
     plt.title("Cr")
     plt.imshow(imgCr, cmap='gray')
 
-    SubCb, SubCr = subsampling(imgCb, imgCr, (4, 2, 0))
+    SubCb, SubCr = subsampling(imgCb, imgCr, (4, 2, 2))
     imgDCT(imgY, SubCb, SubCr)
-    blockY, blockCb, blockCr = imgBlockDct(imgY, SubCb, SubCr, 8)
-    qy, qcb, qcr = quantizer((blockY, blockCb, blockCr), 75)
+    blockY, blockCb, blockCr = imgBlockDct(imgY, SubCb, SubCr, 64)
+    qy, qcb, qcr = quantizer((blockY, blockCb, blockCr), 10)
 
     qy = DPCM(qy, "y")
     qcb = DPCM(qcb, "cb")
@@ -130,7 +130,7 @@ def ycbcr2rgb(Y, Cb, Cr):
     R[R>255] = 255
     G[G>255] = 255
     B[B>255] = 255
-    
+
     R[R<0] = 0
     G[G<0] = 0
     B[B<0] = 0
